@@ -28,7 +28,9 @@ System requirements
 
 Running instructions
 --------------------
-- Modify common/conf/environment.txt with your CAS server information
+- To clone with submodule dependency, use `git clone --recursive <REPO_URL>`
+   - or if you cloned without `--recursive`, run `git submodule update --init`
+- Modify [common/conf/environment.txt](common/conf/environment.txt) with your CAS server information
    - provided by your SAS Viya system admistrator
 - Launch a SAS Studio window to run SAS scripts (*.sas)
 - Or, launch a jupyter notebook to run notebooks (*.ipynb)
