@@ -28,7 +28,7 @@ dvd video 0.95
 mp3 video 0.1
 ;
 
-/** Train word embeddings using vector nodesim, first order proximity **/
+/** Train word embeddings using vector node similarity, first order proximity **/
 %let nDim=10;
 %let convergenceThreshold=0.00001;
 %let nSamples=1000000;
