@@ -2,8 +2,7 @@
 
 This is a home for network-related demos and examples.
 
-Contents
-============
+## Table of Contents
 
 - [Applications](applications/)
     -  [Fraud](applications/fraud)
@@ -13,11 +12,12 @@ Contents
     -  [Social](applications/social)
         - [Inmate Network](applications/social/inmate-network)
 
-Getting Started
-============
+## Overview
 
-System requirements
--------------------
+This repository contains examples and demonstrations of the network analysis capabilities available in SAS® Viya.
+
+### Prerequisites
+
 - [SAS Viya](https://www.sas.com/en_us/software/viya.html)
    - Visual Data Mining and Machine Learning license required for network algorithm execution
 - [graphviz](https://www.graphviz.org/)
@@ -26,11 +26,54 @@ System requirements
    - for jupyter notebook execution
    - packages used in this demo are given in [requirements.txt](requirements.txt)
 
-Running instructions
---------------------
+### Installation
+
+**Quick Start**.
 - To clone with submodule dependency, use `git clone --recursive <REPO_URL>`
    - or if you cloned without `--recursive`, run `git submodule update --init`
 - Modify [common/conf/environment.txt](common/conf/environment.txt) with your CAS server information
    - provided by your SAS Viya system admistrator
 - Launch a SAS Studio window to run SAS scripts (*.sas)
 - Or, launch a jupyter notebook to run notebooks (*.ipynb)
+
+**Details**
+- Clone the repository as specified under **Quick Start** above.
+- Make the following modifications within [common/conf/environment.txt](common/conf/environment.txt) to enable connections to a Cloud Analytic Services (CAS) server. Contact your SAS system administrator (or person who deployed SAS® Viya) for more information:
+   - CAS_SERVER_HOST=<i>set this to the hostname of your CAS server</i>
+   - CAS_SERVER_PORT=<i>set this to the port of your CAS server</i>
+
+### Running
+
+- If you intend to run the SAS language script versions of these demos:
+   - Open SAS Studio in a web browser. Contact your SAS system administrator for the URL to access SAS Studio.
+   - Navigate to the directory where you cloned this repository, and then navigate to the sas/ directory of the demo you wish to run.
+   - Open the .sas script and run by clicking the run icon or pressing F3.
+- If you intend to run the Jupyter notebook versions of these demos:
+   - First ensure that you are have the required python packages installed by using `pip install -r requirements.txt` from a terminal window.
+   - launch a jupyter notebook session by using `jupyter notebook start` from a terminal window.
+   - after launching, use a web browser to connect to the displayed URL for your newly created Jupyter notebook server
+   - navigate to the directory where you cloned this repository, and then navigate to the python/ directory of the demo you wish to run.
+   - open the .ipynb notebook and then run the cells interactively by clicking the run button.
+
+## Contributing
+
+**Required**. Use the default text below if you accept contributions. If you do not accept contributions (e.g., a samples project), note that here.
+
+> We welcome your contributions! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to submit contributions to this project. 
+
+## License
+
+**Required**. Use the default text below. **NOTE:** Nothing different should be used here without prior approval of SAS Legal.
+
+> This project is licensed under the [Apache 2.0 License](LICENSE).
+
+## Additional Resources
+
+**Required**. Include any additional resources that users may need or find useful when using your software. Additional resources might include the following:
+
+* [Proc Network: API documentation, Examples, and Theory for PROC NETWORK](https://go.documentation.sas.com/?docsetId=casmlnetwork&docsetTarget=casmlnetwork_network_toc.htm&docsetVersion=8.5&locale=en)
+* [Proc OptNetwork: API documentation, Examples, and Theory for PROC OPTNETWORK](https://go.documentation.sas.com/?cdcId=pgmsascdc&cdcVersion=9.4_3.5&docsetId=casnopt&docsetTarget=titlepage.htm&locale=en)
+* [CAS Action Sets API Documentation](https://go.documentation.sas.com/?cdcId=pgmsascdc&cdcVersion=9.4_3.5&docsetId=allprodsactions&docsetTarget=actionSetsByName.htm&locale=en)
+* [Network Science Overview Blog Post](https://blogs.sas.com/content/subconsciousmusings/2020/11/30/the-art-and-science-of-working-with-in-connected-data/)
+* [SAS Global Forum paper on pattern matching: Theory and performance comparisons with other graph database vendors](https://www.sas.com/content/dam/SAS/support/en/sas-global-forum-proceedings/2019/3353-2019.pdf)
+* [SAS Global Forum tutorial on using Network to improve Machine Learning Models](https://youtu.be/dStT9Au2bN0)

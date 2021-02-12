@@ -1,3 +1,5 @@
+Copyright © 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+SPDX-License-Identifier: Apache-2.0
 
 %let _COMMON_REPO_ROOT=&_SASPROGRAMFILE/../../../../../common;
 %INCLUDE "&_SASPROGRAMFILE/../../../../../common/sas/cas_connection.sas";
