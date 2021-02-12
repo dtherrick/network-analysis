@@ -57,19 +57,19 @@ This repository contains examples and demonstrations of the network analysis cap
 
 ## Contributing
 
-**Required**. Use the default text below if you accept contributions. If you do not accept contributions (e.g., a samples project), note that here.
+Use the default text below if you accept contributions. If you do not accept contributions (e.g., a samples project), note that here.
 
 > We welcome your contributions! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to submit contributions to this project. 
 
 ## License
 
-**Required**. Use the default text below. **NOTE:** Nothing different should be used here without prior approval of SAS Legal.
+Use the default text below. **NOTE:** Nothing different should be used here without prior approval of SAS Legal.
 
 > This project is licensed under the [Apache 2.0 License](LICENSE).
 
 ## Additional Resources
 
-**Required**. Include any additional resources that users may need or find useful when using your software. Additional resources might include the following:
+Include any additional resources that users may need or find useful when using your software. Additional resources might include the following:
 
 * [Proc Network: API documentation, Examples, and Theory for PROC NETWORK](https://go.documentation.sas.com/?docsetId=casmlnetwork&docsetTarget=casmlnetwork_network_toc.htm&docsetVersion=8.5&locale=en)
 * [Proc OptNetwork: API documentation, Examples, and Theory for PROC OPTNETWORK](https://go.documentation.sas.com/?cdcId=pgmsascdc&cdcVersion=9.4_3.5&docsetId=casnopt&docsetTarget=titlepage.htm&locale=en)
