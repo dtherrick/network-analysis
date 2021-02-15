@@ -22,7 +22,7 @@ This repository contains examples and demonstrations of the network analysis cap
    - Visual Data Mining and Machine Learning license required for network algorithm execution
 - [graphviz](https://www.graphviz.org/)
    - for network visualizations
-- python and required packages
+- python>=3.6.5 and required packages
    - for jupyter notebook execution
    - packages used in this demo are given in [requirements.txt](requirements.txt)
 
@@ -38,6 +38,11 @@ This repository contains examples and demonstrations of the network analysis cap
 
 **Details**
 - Clone the repository as specified under **Quick Start** above.
+- Install a fresh python environment using conda:
+   - `conda init bash`
+   - `conda create --name network-analysis python=3.6.5`
+   - `conda activate network-analysis`
+   - `conda install -c sas-institute --file requirements.txt`
 - Make the following modifications within [common/conf/environment.txt](common/conf/environment.txt) to enable connections to a Cloud Analytic Services (CAS) server. Contact your SAS system administrator (or person who deployed SAS® Viya) for more information:
    - CAS_SERVER_HOST=<i>set this to the hostname of your CAS server</i>
    - CAS_SERVER_PORT=<i>set this to the port of your CAS server</i>
@@ -49,7 +54,7 @@ This repository contains examples and demonstrations of the network analysis cap
    - Navigate to the directory where you cloned this repository, and then navigate to the sas/ directory of the demo you wish to run.
    - Open the .sas script and run by clicking the run icon or pressing F3.
 - If you intend to run the Jupyter notebook versions of these demos:
-   - First ensure that you are have the required python packages installed by using `pip install -r requirements.txt` from a terminal window.
+   - First ensure that you are have the required python packages installed by using `conda install -c conda-forge -c sas-institute --file requirements.txt` from a terminal window (see the above details section for more context).
    - launch a jupyter notebook session by using `jupyter notebook start` from a terminal window.
    - after launching, use a web browser to connect to the displayed URL for your newly created Jupyter notebook server
    - navigate to the directory where you cloned this repository, and then navigate to the python/ directory of the demo you wish to run.
