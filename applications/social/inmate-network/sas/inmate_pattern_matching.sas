@@ -1,7 +1,7 @@
 /* Copyright © 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 SPDX-License-Identifier: Apache-2.0 */
 
-%let _COMMON_REPO_ROOT=&_SASPROGRAMFILE/../../../../common;
+%let _COMMON_REPO_ROOT=&_SASPROGRAMFILE/../../../../../common;
 %INCLUDE "&_COMMON_REPO_ROOT/sas/cas_connection.sas";
 %INCLUDE "&_COMMON_REPO_ROOT/sas/visualization.sas";
 
@@ -101,7 +101,7 @@ run;
 
  %let FILE_N = %EVAL(&selectedMatch);
 data _NULL_;
-   file "&_SASPROGRAMFILE/../dot/&fileRoot._&FILE_N..dot";
+   file "&_SASPROGRAMFILE/../../dot/&fileRoot._&FILE_N..dot";
 %graph2dot(
    nodes=nodesInMatch,
    links=linksInMatch,

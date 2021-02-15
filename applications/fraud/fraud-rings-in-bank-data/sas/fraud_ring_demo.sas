@@ -11,7 +11,7 @@ SPDX-License-Identifier: Apache-2.0 */
    https://maxdemarzi.com/2020/03/20/finding-fraud-part-two-revised/amp/
 ***/
 
-%let _COMMON_REPO_ROOT=&_SASPROGRAMFILE/../../../../common;
+%let _COMMON_REPO_ROOT=&_SASPROGRAMFILE/../../../../../common;
 %INCLUDE "&_COMMON_REPO_ROOT/sas/cas_connection.sas";
 %INCLUDE "&_COMMON_REPO_ROOT/sas/visualization.sas";
 
@@ -91,7 +91,7 @@ run;
 /***************************************/
 /*** There are 1000 female names in the text file ***/
 data femaleNames;
-   infile "&_SASPROGRAMFILE/../data/female_first_names.txt";
+   infile "&_SASPROGRAMFILE/../../data/female_first_names.txt";
    length firstName $12 gender $8;
    input firstName $;
    gender='female';
@@ -101,7 +101,7 @@ proc print data=femaleNames(obs=10); run;
 
 /*** And 1000 male names ***/
 data maleNames;
-   infile "&_SASPROGRAMFILE/../data/male_first_names.txt";
+   infile "&_SASPROGRAMFILE/../../data/male_first_names.txt";
    length firstName $12 gender $8;
    input firstName $;
    gender='male';
@@ -111,7 +111,7 @@ proc print data=maleNames(obs=10); run;
 
 /*** To be combined with 1000 last names ***/
 data lastNames;
-   infile "&_SASPROGRAMFILE/../data/last_names.txt";
+   infile "&_SASPROGRAMFILE/../../data/last_names.txt";
    length lastName $12;
    input lastName $;
 run;
@@ -536,7 +536,7 @@ data mycas.NodesQuery;
 3 SSN
 ;
 data _NULL_;
-   file "&_SASPROGRAMFILE/../dot/fraud_ring_demo_9.dot";
+   file "&_SASPROGRAMFILE/../../dot/fraud_ring_demo_9.dot";
 %graph2dot(
    nodes=mycas.NodesQuery,
    links=mycas.LinksQuery,

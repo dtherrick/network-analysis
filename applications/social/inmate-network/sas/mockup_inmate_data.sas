@@ -1,7 +1,7 @@
 /* Copyright © 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 SPDX-License-Identifier: Apache-2.0 */
 
-%let _COMMON_REPO_ROOT=&_SASPROGRAMFILE/../../../../common;
+%let _COMMON_REPO_ROOT=&_SASPROGRAMFILE/../../../../../common;
 %INCLUDE "&_COMMON_REPO_ROOT/sas/cas_connection.sas";
 
 
@@ -14,7 +14,7 @@ SPDX-License-Identifier: Apache-2.0 */
 /*********************/
 /* Mockup Parameters */
 /*********************/
-%let LOCAL_DATA_DIR=&_SASPROGRAMFILE/../data;
+%let LOCAL_DATA_DIR=&_SASPROGRAMFILE/../../data;
 
 %let RANDOM_SEED=123;
 %let DAY_SECS=86400;
@@ -47,7 +47,7 @@ data sentenceDistribution;
 100   1.0   1.0
 ;
 options printerpath=svg nodate nonumber papersize=('3.75in','3.75in');
-ods printer file="&_SASPROGRAMFILE/../svg/mockup_inmate_data_0.svg" NEWFILE=PAGE;
+ods printer file="&_SASPROGRAMFILE/../../svg/mockup_inmate_data_0.svg" NEWFILE=PAGE;
 proc print data=sentenceDistribution; run;
 ods printer close;    
 

@@ -1,7 +1,7 @@
 /* Copyright © 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 SPDX-License-Identifier: Apache-2.0 */
 
-%let _COMMON_REPO_ROOT=&_SASPROGRAMFILE/../../../../common;
+%let _COMMON_REPO_ROOT=&_SASPROGRAMFILE/../../../../../common;
 %INCLUDE "&_COMMON_REPO_ROOT/sas/cas_connection.sas";
 %INCLUDE "&_COMMON_REPO_ROOT/sas/visualization.sas";
 
@@ -56,13 +56,13 @@ run;
 proc print data=mycas.outSim; by source; run;
 
 options printerpath=svg nodate nonumber papersize=('2.75in','2.1in');
-ods printer file="&_SASPROGRAMFILE/../svg/word_embeddings_0.svg" NEWFILE=PAGE;
+ods printer file="&_SASPROGRAMFILE/../../svg/word_embeddings_0.svg" NEWFILE=PAGE;
 proc print data=mycas.synonymLinks; run;
 ods printer close;
 
 
 options printerpath=svg nodate nonumber papersize=('2.75in','7.75in');
-ods printer file="&_SASPROGRAMFILE/../svg/word_embeddings_1.svg" NEWFILE=PAGE;
+ods printer file="&_SASPROGRAMFILE/../../svg/word_embeddings_1.svg" NEWFILE=PAGE;
 proc print data=mycas.outSim; by source; run;
 ods printer close;    
 
@@ -259,7 +259,7 @@ proc sort out=linksPurchase data=mycas.LinksPurchase;
 run;
 
 data _NULL_;
-   file "&_SASPROGRAMFILE/../dot/approximate_patternmatch_0.dot";
+   file "&_SASPROGRAMFILE/../../dot/approximate_patternmatch_0.dot";
 %graph2dot(
    nodes=nodesPurchase,
    links=linksPurchase,
@@ -275,7 +275,7 @@ run;
 /*****************************/
 
 data _NULL_;
-   file "&_SASPROGRAMFILE/../dot/approximate_patternmatch_1.dot";
+   file "&_SASPROGRAMFILE/../../dot/approximate_patternmatch_1.dot";
 %graph2dot(
    links=mycas.LinksQuery,
    graphAttrs="layout=sfdp",
@@ -320,7 +320,7 @@ run;
 
  %let FILE_N = %EVAL(1 + &selectedMatch);
 data _NULL_;
-   file "&_SASPROGRAMFILE/../dot/approximate_patternmatch_&FILE_N..dot";
+   file "&_SASPROGRAMFILE/../../dot/approximate_patternmatch_&FILE_N..dot";
 %graph2dot(
    nodes=nodesPurchaseHighlighted,
    links=linksPurchaseHighlighted,
