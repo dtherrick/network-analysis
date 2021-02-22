@@ -72,9 +72,17 @@ This project is licensed under the [Apache 2.0 License](LICENSE).
 
 For more information, please visit the following:
 
+**Documentation**
 * [Proc Network: API documentation, Examples, and Theory for PROC NETWORK](https://go.documentation.sas.com/?cdcId=pgmsascdc&cdcVersion=default&docsetId=casmlnetwork&docsetTarget=titlepage.htm&locale=en)
 * [Proc OptNetwork: API documentation, Examples, and Theory for PROC OPTNETWORK](https://go.documentation.sas.com/?cdcId=pgmsascdc&cdcVersion=default&docsetId=casnopt&docsetTarget=titlepage.htm&locale=en)
 * [CAS Action Sets API Documentation](https://go.documentation.sas.com/?cdcId=pgmsascdc&cdcVersion=default&docsetId=allprodsactions&docsetTarget=actionSetsByName.htm&locale=en)
-* [Network Science Overview Blog Post](https://blogs.sas.com/content/subconsciousmusings/2020/11/30/the-art-and-science-of-working-with-in-connected-data/)
+
+**Blog Posts**
+* [The art and science of finding answers in connected data](https://blogs.sas.com/content/subconsciousmusings/2020/11/30/the-art-and-science-of-working-with-in-connected-data/)
+* [Mobility tracing: Helping local authorities in the fight against COVID-19](https://blogs.sas.com/content/sascom/2020/07/08/mobility-tracing-helping-local-authorities-in-the-fight-against-covid-19/)
+* [Using data visualization to solve a global cybersecurity incident](https://blogs.sas.com/content/subconsciousmusings/2020/12/03/using-data-visualization-to-solve-a-global-cybersecurity-incident/)
+* [Incorporating Network Optimization in Data Science: The Graph Coloring Problem](https://www.linkedin.com/pulse/incorporating-network-optimization-data-science-graph-jay-laramore/)
+
+**SAS Global Forum**
 * [SAS Global Forum paper on pattern matching: Theory and performance comparisons with other graph database vendors](https://www.sas.com/content/dam/SAS/support/en/sas-global-forum-proceedings/2019/3353-2019.pdf)
 * [SAS Global Forum tutorial on using Network to improve Machine Learning Models](https://youtu.be/dStT9Au2bN0)
