@@ -1,6 +1,10 @@
 /* Copyright © 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 SPDX-License-Identifier: Apache-2.0 */
 
+/*******************************************************************/
+/* Required: Run mockup_inmate_data.sas before running this script */
+/*******************************************************************/
+
 %let _COMMON_REPO_ROOT=&_SASPROGRAMFILE/../../../../../common;
 %INCLUDE "&_COMMON_REPO_ROOT/sas/cas_connection.sas";
 %INCLUDE "&_COMMON_REPO_ROOT/sas/visualization.sas";
