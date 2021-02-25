@@ -28,7 +28,7 @@ This repository contains examples and demonstrations of the network analysis cap
 
 ### Installation
 
-**Quick Start**.
+**Quick Start**
 - To clone with submodule dependency, use `git clone --recursive <REPO_URL>`
    - or if you cloned without `--recursive`, run `git submodule update --init`
 - Modify [common/conf/environment.txt](common/conf/environment.txt) with your CAS server information
@@ -59,6 +59,9 @@ This repository contains examples and demonstrations of the network analysis cap
    - after launching, use a web browser to connect to the displayed URL for your newly created Jupyter notebook server
    - navigate to the directory where you cloned this repository, and then navigate to the python/ directory of the demo you wish to run.
    - open the .ipynb notebook and then run the cells interactively by clicking the run button.
+
+### Viewing graphs with graphviz
+The SAS language scripts in various examples and demos produce graph visualizations produced with graphviz, which are saved in files with the extension .dot. To View them, you can convert them to to a rendered format, such as .png, with the command `dot -Tpng sample.dot > sample.png`. If you do not have graphviz installed, there are also online graphviz viewers that may be used to convert your .dot file content to an image.
 
 ## Contributing
 
