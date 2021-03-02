@@ -366,7 +366,7 @@ run;
       nodeAttrs="fillcolor=color, label=name",
       linkAttrs="label=label",
       graphAttrs="layout=&layout",
-      directed=1
+      directed=0
    );
    run;
    %end;
