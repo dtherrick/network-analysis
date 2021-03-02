@@ -70,6 +70,7 @@ ods printer close;
 /*********************************************************/
 /* Approximate Pattern Matching Based on Word Embeddings */
 /*********************************************************/
+%INCLUDE "&_SASPROGRAMFILE/../helper_macros.sas";
 
 /** Main graph: purchase history for 6 people for 5 categories of products **/
 data mycas.NodesPurchase;
@@ -131,6 +132,7 @@ data mycas.LinksPurchase;
 ;
 
 /** Query graph: find pair of persons who purchased the same 2 video items **/
+/* Four nodes, two person nodes and two "video" nodes */
 data mycas.nodesQuery;
    length node $8. type $8.;
    input node $ type $;
@@ -140,6 +142,7 @@ Person2 person
 Video1  video
 Video2  video
 ;
+/* Four links, each person must have purchased both "video" items */
 data mycas.LinksQuery;
    length from $8. to $8.;
    input from $ to $;
@@ -163,38 +166,6 @@ data mycas.NodesPurchaseEmbed;
 run;
 
 
-/** Macro Definitions **/
-
-/* Generate expressions for fcmp variable lists */
-/*
-varsCommaN      = n.vec_1,nQ.vec_1,n.vec_2,nQ.vec_2,...
-varsDotProductN = n.vec_1*nQ.vec_1+n.vec_2*nQ.vec_2+...
-*/
-data _null_;
-   length varsCommaN varsDotProductN VARCHAR(32767);
-   varsCommaN      = '';
-   varsDotProductN = '';
-   do i = 1 to &nDim;
-     varsCommaN     = catx(',',varsCommaN,     cats('n.vec_', i,',nQ.vec_',i));
-     varsDotProductN= catx('+',varsDotProductN,cats('n.vec_', i,'*nQ.vec_',i));
-   end;
-   call symput('varsCommaN',      trim(varsCommaN));
-   call symput('varsDotProductN', trim(varsDotProductN));
-run;
-
-/* GetValue() is used to grab the value of a field in _NETWORK_ result macro variable */
-%macro GetValue(mac=, item=);
-   %let prs = %sysfunc(prxparse(m/\b&item=/i));
-   %if %sysfunc(prxmatch(&prs, &&&mac)) %then %do;
-      %let prs = %sysfunc(prxparse(s/.*\b&item=([^ ]+).*/$1/i));
-      %let return_val = %sysfunc(prxchange(&prs, 1, &&&mac));
-      &return_val
-   %end;
-   %else %do;
-      %put ERROR: Cannot find &item!;
-        .
-   %end;
-%mend;
 
 /* Consider two types to be equivalent if the vector dot product value exceeds this threshold */
 %let fuzzyMatchThreshold=0.7;
@@ -204,26 +175,23 @@ proc cas;
    source myFilters;
       /** Node filter: we require exact match for type=person, approximate match otherwise **/
       function nodeFilter(n.type $, nQ.type $, &varsCommaN);
+         /* If statement logic: do an exact mach on type='person' */
          if (nQ.type EQ 'person') then return (n.type EQ nQ.type);
+         /* If statement logic: otherwise, do an approximate match based on embeddings dot product */
          if (&varsDotProductN > &fuzzyMatchThreshold) then return (1);
          return (0);
       endsub;
 
       /** Node pair filter: don't enumerate redundant (symmetric) permutations **/
       function nodePairFilter(n.node[*] $, nQ.node[*] $);
+         /* If statement logic: keep the permutation with smaller Person node label */
          if(nQ.node[1] EQ 'Person1' AND nQ.node[2] EQ 'Person2') then return (n.node[1] LT n.node[2]);
+         /* If statement logic: keep the permutation with smaller Video node label */
          if(nQ.node[1] EQ 'Video1' AND nQ.node[2] EQ 'Video2') then return (n.node[1] LT n.node[2]);
          return (1);
       endsub;
    endsource;
-   loadactionset "fcmpact";
-   setSessOpt{cmplib="casuser.myRoutines"}; run;
-   fcmpact.addRoutines /
-   saveTable = true,
-   funcTable = {name="myRoutines", caslib="casuser", replace=true},
-   package = "myPackage",
-   routineCode = myFilters;
-   run;
+   %FCMPActionLoad();
 quit;
 
 /* Approximate PatternMatch */
@@ -286,52 +254,5 @@ run;
 /*******************************/
 /* Matches Found Visualization */
 /*******************************/
-
-%macro visualizeMatches();
-%let highlightColor='blue';
-%let highlightThickness=3;
-
-%do selectedMatch=1 %to &numMatches;
-data mycas.LinksPurchaseHighlighted;
-   merge mycas.LinksPurchase
-         mycas.outMatchLinks(in=inMatch where=(match=&selectedMatch));
-   by from to;
-   if inMatch then do;
-      color=&highlightColor;
-      thickness=&highlightThickness;
-   end;
-run;
-data mycas.NodesPurchaseHighlighted;
-   merge mycas.NodesPurchase
-         mycas.outMatchNodes(in=inMatch where=(match=&selectedMatch));
-   by node;
-   if inMatch then do;
-      pencolor=&highlightColor;
-      thickness=&highlightThickness;
-   end;
-run;
-proc sort out=nodesPurchaseHighlighted data=mycas.NodesPurchaseHighlighted;
-   by descending node;
-run;
-
-proc sort out=linksPurchaseHighlighted data=mycas.LinksPurchaseHighlighted;
-   by from to;
-run;
-
- %let FILE_N = %EVAL(1 + &selectedMatch);
-data _NULL_;
-   file "&_SASPROGRAMFILE/../../dot/approximate_patternmatch_&FILE_N..dot";
-%graph2dot(
-   nodes=nodesPurchaseHighlighted,
-   links=linksPurchaseHighlighted,
-   nodesAttrs="colorscheme=paired8, style=filled, color=black",
-   nodeAttrs="fillcolor=color, label=label, color=pencolor, penwidth=thickness",
-   linkAttrs="color=color, penwidth=thickness",
-   graphAttrs="layout=sfdp, overlap=prism, overlap_scaling=-3",
-   directed=1
-);
-run;
-%end;
-%mend;
 
 %visualizeMatches();
