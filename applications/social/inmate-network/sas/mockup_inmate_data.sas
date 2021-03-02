@@ -3,6 +3,7 @@ SPDX-License-Identifier: Apache-2.0 */
 
 %let _COMMON_REPO_ROOT=&_SASPROGRAMFILE/../../../../../common;
 %INCLUDE "&_COMMON_REPO_ROOT/sas/cas_connection.sas";
+%INCLUDE "&_SASPROGRAMFILE/../helper_macros.sas";
 
 
 /******************/
@@ -50,19 +51,6 @@ options printerpath=svg nodate nonumber papersize=('3.75in','3.75in');
 ods printer file="&_SASPROGRAMFILE/../../svg/mockup_inmate_data_0.svg" NEWFILE=PAGE;
 proc print data=sentenceDistribution; run;
 ods printer close;    
-
-%macro sampleSentenceLen(colToUse);
-   x=rand("Uniform",0,1);
-   _i_=1;
-   do while(^done);
-      set sentenceDistribution point=_i_ end=done;
-      if x LT &colToUse then do;
-         leave;
-      end;
-      _i_=_i_+1;
-   end;
-   sentenceYears = years;
-%mend;
 
 
 /***************/
@@ -119,12 +107,6 @@ data inmateSentences;
    keep inmateId region sentenceStart sentenceEnd sentenceYears;
    stop;
 run;
-%macro addUniqueID(dataSet, idVarname);
-data &dataSet;
-   set &dataSet;
-   &idVarname = _n_ + (_threadid_ * 1E4);
-run;
-%mend addUniqueID;
 %addUniqueId(inmateSentences,sentenceId);
 
 proc sort data=inmateSentences out=inmateSentencesByStart;
@@ -247,60 +229,13 @@ proc sql;
    from inmateCell
    group by inmateId;
 quit;
-proc sql;
-   create table cells as
-   select distinct cellId
-   from cellSection;
-quit;
-proc sql;
-   create table sections as
-   select distinct sectionId
-   from sectionPrison;
-quit;
-proc sql;
-   create table prisons as
-   select distinct prisonId
-   from prisonRegion;
-quit;
-proc sql;
-   create table regions as
-   select distinct regionId
-   from prisonRegion;
-quit;
+%makeNodesFromLinks(cell, cellSection);
+%makeNodesFromLinks(section, sectionPrison);
+%makeNodesFromLinks(prison, prisonRegion);
+%makeNodesFromLinks(region, prisonRegion);
+
 /* Add first and last names */
-data maleNames;
-   length firstName $12;
-   infile "&LOCAL_DATA_DIR/male_first_names.txt";
-   input firstName;
-run;
-data lastNames;
-   length lastName $12;
-   infile "&LOCAL_DATA_DIR/last_names.txt";
-   input lastName;
-run;
-data inmates;
-   call streaminit( &RANDOM_SEED );
-   set inmates;
-   x=rand("Integer", 1, 1000);
-   set maleNames point=x;
-   x=rand("Integer", 1, 1000);
-   set lastNames point=x;
-   drop x;
-run;
-
-
-
-%macro UploadAndSaveData(dataset);
-data mycas.&dataset; set &dataset; run;
-proc cas noqueue;
-  table.save /
-      table="&dataset"
-      name="&dataset..sas7bdat"
-      replace=true
-      ;
-  run;
-quit;
-%mend;
+%assignRandomNames(inmates, inmates);
 
 %UploadAndSaveData(inmates);
 %UploadAndSaveData(cells);

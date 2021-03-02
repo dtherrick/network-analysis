@@ -1,6 +1,6 @@
 digraph G {
 layout=sfdp
-node[colorscheme=paired8, style=filled, color=black]
+node[colorscheme=paired8, style=filled, color=black, fixedSize=true, width=1.4, height=.8]
 "I18758"[fillcolor= "1",label= "Ronnie\nMoreno"]
 "I37385"[fillcolor= "1",label= "Sincere\nMercado"]
 "I16215"[fillcolor= "1",label= "Devyn\nStephenson"]

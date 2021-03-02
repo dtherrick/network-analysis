@@ -1,13 +1,10 @@
 /* Copyright © 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
 SPDX-License-Identifier: Apache-2.0 */
 
-/*******************************************************************/
-/* Required: Run mockup_inmate_data.sas before running this script */
-/*******************************************************************/
-
 %let _COMMON_REPO_ROOT=&_SASPROGRAMFILE/../../../../../common;
 %INCLUDE "&_COMMON_REPO_ROOT/sas/cas_connection.sas";
 %INCLUDE "&_COMMON_REPO_ROOT/sas/visualization.sas";
+%INCLUDE "&_SASPROGRAMFILE/../helper_macros.sas";
 
 
 /******************/
@@ -20,14 +17,11 @@ SPDX-License-Identifier: Apache-2.0 */
 /*************/
 /* Load Data */
 /*************/
-%macro LoadData(dataset);
-  table.loadTable result = r / 
-      casout={name="&dataset", replace=true}
-      path="&dataset..sas7bdat"
-      ;
-  run;
-%mend;
+%checkForDataFiles();
 
+/* If all nine required mockup data files exist, load them. Otherwise, run the mockup script. */
+
+%if "&FOUND"="9" %then %do;
 proc cas noqueue;
    %LoadData(inmates);
    %LoadData(cells);
@@ -40,84 +34,10 @@ proc cas noqueue;
    %LoadData(sectionPrison);
    %LoadData(prisonRegion);
 quit;
-
-%macro GetValue(mac=, item=);
-   %let prs = %sysfunc(prxparse(m/\b&item=/i));
-   %if %sysfunc(prxmatch(&prs, &&&mac)) %then %do;
-      %let prs = %sysfunc(prxparse(s/.*\b&item=([^ ]+).*/$1/i));
-      %let return_val = %sysfunc(prxchange(&prs, 1, &&&mac));
-      &return_val
-   %end;
-   %else %do;
-      %put ERROR: Cannot find &item!;
-        .
-   %end;
-%mend;
-
-%macro visualizeMatches(fileRoot, queryKey=_NULL_, num=&numMatches, layout=dot);
-%let highlightColor='blue';
-%let highlightThickness=3;
-
-%do selectedMatch=1 %to &num;
-data mycas.LinksInMatch;
-%if %QUOTE(&queryKey) = _NULL_ %then %do;
-   set mycas.outMatchLinks(where=(match=&selectedMatch));
 %end;
 %else %do;
-   set mycas.outMatchLinks(where=(queryKey=&queryKey and match=&selectedMatch));
+   %INCLUDE "&_SASPROGRAMFILE/../mockup_inmate_data.sas";
 %end;
-   length label $40;
-   by from to;
-   if start EQ . then label = "";
-   else do;
-      label = CATS(
-         "[",
-         put(start,DATETIME9.),
-         ",",
-         put(end,DATETIME9.),
-         "]"
-      );
-   end;
-run;
-data mycas.NodesInMatch;
-%if %QUOTE(&queryKey) = _NULL_ %then %do;
-   set mycas.outMatchNodes(where=(match=&selectedMatch));
-%end;
-%else %do;
-   set mycas.outMatchNodes(where=(queryKey=&queryKey and match=&selectedMatch));
-%end;
-   length label $40;
-   by node;
-   nodeLen = length(node);
-   if      type EQ 'INMATE'  then color='1';
-   else if type EQ 'CELL'    then color='2';
-   else if type EQ 'SECTION' then color='3';
-   if      type EQ 'INMATE'  then label=CATX('\n',firstName,lastName);
-   else                           label=substr(node,nodeLen-5);
-run;
-proc sort out=nodesInMatch data=mycas.NodesInMatch;
-   by descending nodeQ;
-run;
-
-proc sort out=linksInMatch data=mycas.LinksInMatch;
-   by from to;
-run;
-
- %let FILE_N = %EVAL(&selectedMatch);
-data _NULL_;
-   file "&_SASPROGRAMFILE/../../dot/&fileRoot._&FILE_N..dot";
-%graph2dot(
-   nodes=nodesInMatch,
-   links=linksInMatch,
-   nodesAttrs="colorscheme=paired8, style=filled, color=black",
-   nodeAttrs="fillcolor=color, label=label",
-   linkAttrs="label=label",
-   graphAttrs="layout=&layout",
-   directed=1
-);
-run;
-%end;
-%mend;
 
 /*************************/
 /* Define and Load Graph */
@@ -149,29 +69,9 @@ data mycas.links;
    keep from to sentenceId start end;
 run;
 
-%macro loadGraph();
-   %if (%symexist(graphId)) %then %do;
-      proc cas;
-         network.unloadGraph result=r /
-            display={excludeAll=TRUE} graph = &graphId;
-      run;
-      %symdel graphId;
-   %end;
-   proc cas;
-      network.loadGraph result=r /
-         display={excludeAll=TRUE}
-         direction = "directed"
-         links = {name="links"} 
-         linksVar = {vars={"start", "end"}}
-         nodes = {name="nodes"}
-         nodesVar = {vars={"type", "firstName", "lastName"}};
-      run;
-      symput('graphId',(string)r.graph);
-      print r;
-   quit;
-%mend loadGraph;
-
+/* Load an in-memory copy of this directed graph */
 %loadGraph();
+
 
 /************************/
 /* PatternMatch Queries */
@@ -179,6 +79,11 @@ run;
 
 /** Example 1**/
 /* Find inmates that shared a cell with fictional mob boss Jett Mccormick */
+
+
+/* Define the Nodes Query Table */
+/* This table includes the nodes for desired pattern: two inmates, and once cell */
+/* One of the inmates will be specified as Jett Mccormick */
 data mycas.nodesQ;
    infile datalines dsd;
    length node $12 type $12 firstName $12 lastName $12;
@@ -188,6 +93,8 @@ mobBoss, INMATE, Jett, Mccormick
 inmate2, INMATE, , 
 cell, CELL, , 
 ;
+/* Define the Links Query Table */
+/* This table includes the links for desired pattern: both inmates were assigned to the cell */
 data mycas.linksQ;
    infile datalines dsd;
    length from $12 to $12;
@@ -201,23 +108,19 @@ inmate2, cell
 proc cas;
    source myFilter;
       function hasOverlap(start[*], end[*]);
+         /* Time range overlap detection function */
+         /* This function will be reused in the link pair filter of each example */
          intervalTotal = MAX(end[1],end[2]) - MIN(start[1],start[2]);
          interval1 = end[1]-start[1];
          interval2 = end[2]-start[2];
          return (interval1 + interval2 GT intervalTotal);
       endsub;
       function myLinkPairFilter1(start[*], end[*]);
+         /* Filter to keep only matches with some time overlap between cell occupancy */
          return (hasOverlap(start, end));
       endsub;
    endsource;
-   loadactionset "fcmpact";
-   setSessOpt{cmplib="casuser.myRoutines"}; run;
-   fcmpact.addRoutines /
-      saveTable   = true,
-      funcTable   = {name="myRoutines", caslib="casuser", replace=true},
-      package     = "myPackage",
-      routineCode = myFilter;
-   run;
+   %FCMPActionLoad(append=false);
 quit;
 
 proc network
@@ -234,17 +137,6 @@ proc network
 run;
 %let numMatches = %GetValue(mac=_network_,item=num_matches);
 
-%macro joinNodeInfo(outputTable, nodesTable, outputKey, nodesKey, outputVarName, nodesExpr);
-   proc fedsql sessref=mySession;
-      create table &outputTable {options replace=true} as
-      select &NodesExpr as &outputVarName, a.*
-      from &outputTable as a
-      join &nodesTable as b
-      on a.&outputKey = b.&nodesKey
-      ;
-   quit;
-%mend joinNodeInfo;
-
 %joinNodeInfo(outMatchLinks, inmates, from, inmateId, name, (firstName || ' ' || lastName));
 
 title "Inmates Sharing a cell with Jett Mccormick";
@@ -255,62 +147,68 @@ run;
 title;
 
 
-/*******************************/
-/* Matches Found Visualization */
-/*******************************/
+/*****************************************/
+/* Query and Matches Found Visualization */
+/*****************************************/
 
 
+%visualizeQuery(query_1);
 %visualizeMatches(query_1_match);
-
 
 
 /** Example 2: **/
 /* Find inmates in the same section as Jett Mccormick */
+
+/* Define the Nodes Query Table */
+/* This table includes the nodes for two desired patterns:*/
+/* A: two inmates, sharing both cell and section */
+/* B: two inmates, in different cells, but same section */
+/* One of the inmates will be specified as Jett Mccormick */
 data mycas.nodesQ;
    infile datalines dsd;
    length querykey $2 node $12 type $12 firstName $12 lastName $12;
    input querykey $ node $ type $ firstName $ lastName $;
    datalines;
-0, mobBoss, INMATE, Jett, Mccormick
-0, inmate2, INMATE, , 
-0, cell, CELL, , 
-1, mobBoss, INMATE, Jett, Mccormick
-1, inmate2, INMATE, , 
-1, cell1, CELL, , 
-1, cell2, CELL, ,
-1, section, SECTION, ,
+A, mobBoss, INMATE, Jett, Mccormick
+A, inmate2, INMATE, , 
+A, cell, CELL, , 
+A, section, SECTION, ,
+B, mobBoss, INMATE, Jett, Mccormick
+B, inmate2, INMATE, , 
+B, cell1, CELL, , 
+B, cell2, CELL, ,
+B, section, SECTION, ,
 ;
+/* Define the Links Query Table */
+/* This table includes the links for two desired patterns: */
+/* A: two inmates, sharing both cell and section */
+/* B: two inmates, in different cells, but same section */
 data mycas.linksQ;
    infile datalines dsd;
    length querykey $2 from $12 to $12;
    input querykey $ from $ to $;
    datalines;
-0, mobBoss, cell
-0, inmate2, cell
-1, mobBoss, cell1
-1, inmate2, cell2
-1, cell1, section
-1, cell2, section
+A, mobBoss, cell
+A, inmate2, cell
+A, cell, section
+B, mobBoss, cell1
+B, inmate2, cell2
+B, cell1, section
+B, cell2, section
 ;
 
 /** Define FCMP Functions **/
 proc cas;
    source myFilter;
       function myLinkPairFilter2(start[*], end[*]);
+         /* Filter to keep only matches with some time overlap between cell occupancy */
+         /* Add if statement logic to ignore section-cell links, which have no time stamps */
          if(start[1] NE . AND start[2] NE .) then
             return (hasOverlap(start, end));
          return (1);
       endsub;
    endsource;
-   loadactionset "fcmpact";
-   setSessOpt{cmplib="casuser.myRoutines"}; run;
-   fcmpact.addRoutines /
-      appendTable = true,
-      saveTable   = true,
-      funcTable   = {name="myRoutines", caslib="casuser", replace=true},
-      package     = "myPackage",
-      routineCode = myFilter;
-   run;
+   %FCMPActionLoad(append=true);
 quit;
 
 proc network
@@ -331,19 +229,39 @@ proc sort data=mycas.outMatchNodes out=outMatchNodes; by queryKey match type nod
 title "Inmates in same Section at same time as Jett Mccormick";
 proc print 
    data=outMatchNodes(where=
-      (type="INMATE" OR nodeQ="section" OR
-      (nodeQ="cell" AND queryKey="0")
-      )
-      obs=50);
-   by querykey;
+      (
+         (type="INMATE" OR nodeQ="section")
+         AND (match LE 3)
+      ));
+   by querykey match;
 run;
 title;
 
-%let numMatches = 5;
-%visualizeMatches(query_2_match, queryKey="1");
+
+%visualizeQuery(query_2A, queryKey="A");
+%visualizeQuery(query_2B, queryKey="B");
+
+%let numMatches = 3;
+%visualizeMatches(query_2A_match, queryKey="A");
+%visualizeMatches(query_2B_match, queryKey="B");
 
 /** Example 3: **/
 /* Find "cliques" of cell-sharing inmates */
+
+/* In this example, we are interested in triples of inmates who */
+/* each shared a cell with the others at some point. */
+/* The query graph construction is complex, since this could happen in */
+/* one of four different topologies, described below. */
+
+/* See example 4 for a cleaner approach to solve the same problem using the clique algorithm. */
+
+/* Define the Nodes Query Table */
+/* This table includes the nodes for four desired patterns:*/
+/* 0: three inmates, each pair sharing one of three different cells */
+/* 1: three inmates, each pair sharing one of two different cells */
+/* 2: three inmates, each pair sharing the same cell at different times, two inmates have multiple stays */
+/* 3: three inmates, each pair sharing the same cell at different times, one inmate has multiple stays */
+/* the variable 'ordering' is inserted to break symmetry and reject isomorphic permutations of the same solution. */
 data mycas.nodesQ;
    infile datalines dsd;
    length querykey $2 node $12 type $12;
@@ -369,6 +287,15 @@ data mycas.nodesQ;
 3, inmate3, INMATE,.
 3, cellA, CELL,.
 ;
+
+/* Define the Links Query Table */
+/* This table includes the links for four desired patterns:*/
+/* 0: three inmates, each pair sharing one of three different cells */
+/* 1: three inmates, each pair sharing one of two different cells */
+/* 2: three inmates, each pair sharing the same cell at different times, two inmates have multiple stays */
+/* 3: three inmates, each pair sharing the same cell at different times, one inmate has multiple stays */
+/* the variable 'constrain' is inserted to indicate link pairs for which overlap should be enforced. */
+/* overlap will be enforced for two links only if the bitwise representation has at least one common high bit. */
 data mycas.linksQ;
    infile datalines dsd;
    length querykey $2 from $12 to $12;
@@ -400,26 +327,21 @@ data mycas.linksQ;
 proc cas;
    source myFilter;
       function myLinkPairFilter3(from[*] $, start[*], end[*], constrain[*]);
+         /* Filter to keep only matches with some time overlap between cell occupancy */
+         /* Add if statement logic to enforce only the necessary inmate-cell link pairs */
          if(BAND(constrain[1], constrain[2]) GT 0 AND from[1] LT from[2]) then
             return (hasOverlap(start, end));
          return (1);
       endsub;
       function myNodePairFilter3(node[*] $, ordering[*]);
+         /* Filter to keep only one match for each set of isomorphic permutations */
          if(ordering[1] EQ . OR ordering[2] EQ .) then return (1);
          if(ordering[1] LT ordering[2]) then
             return (node[1] LT node[2]);
          return (1);
       endsub;
    endsource;
-   loadactionset "fcmpact";
-   setSessOpt{cmplib="casuser.myRoutines"}; run;
-   fcmpact.addRoutines /
-      appendTable = true,
-      saveTable   = true,
-      funcTable   = {name="myRoutines", caslib="casuser", replace=true},
-      package     = "myPackage",
-      routineCode = myFilter;
-   run;
+   %FCMPActionLoad(append=true);
 quit;
 
 proc network
@@ -446,6 +368,10 @@ proc print data=mycas.outMatchLinks(obs=50); by querykey match; run;
 proc print data=mycas.outMatchNodes(obs=50); by querykey match; run;
 title;
 
+%visualizeQuery(query_3_0, queryKey="0");
+%visualizeQuery(query_3_1, queryKey="1");
+%visualizeQuery(query_3_2, queryKey="2");
+%visualizeQuery(query_3_3, queryKey="3");
 %visualizeMatches(query_3_0_match, queryKey="0", num=1, layout=sfdp);
 %visualizeMatches(query_3_1_match, queryKey="1", num=3, layout=sfdp);
 %visualizeMatches(query_3_3_match, queryKey="3", num=3, layout=sfdp);
@@ -454,6 +380,10 @@ title;
 /** Example 4: **/
 /* Find "cliques" using patternMatch (preprocess) + clique */
 /* An alternative approach to arrive at the answer of Example 3 */
+
+/* Define the Nodes Query Table */
+/* This table includes the nodes for the desired pattern:*/
+/* Two inmates sharing the same cell */
 data mycas.nodesQ;
    infile datalines dsd;
    length node $12 type $12;
@@ -461,39 +391,36 @@ data mycas.nodesQ;
    datalines;
 inmate1, INMATE,1
 inmate2, INMATE,2
-cellA, CELL,.
+cell, CELL,.
 ;
+/* Define the Links Query Table */
+/* This table includes the links for the desired pattern:*/
+/* Two inmates sharing the same cell */
 data mycas.linksQ;
    infile datalines dsd;
    length from $12 to $12;
    input from $ to $;
    datalines;
-inmate1, cellA
-inmate2, cellA
+inmate1, cell
+inmate2, cell
 ;
 
 /** Define FCMP Functions **/
 proc cas;
    source myFilter;
       function myLinkPairFilter4(start[*], end[*]);
+         /* Filter to keep only matches with some time overlap between cell occupancy */
          return (hasOverlap(start, end));
       endsub;
       function myNodePairFilter4(node[*] $, ordering[*]);
+         /* Filter to keep only one match for each set of isomorphic permutations */
          if(ordering[1] EQ . OR ordering[2] EQ .) then return (1);
          if(ordering[1] LT ordering[2]) then
             return (node[1] LT node[2]);
          return (1);
       endsub;
    endsource;
-   loadactionset "fcmpact";
-   setSessOpt{cmplib="casuser.myRoutines"}; run;
-   fcmpact.addRoutines /
-      appendTable = true,
-      saveTable   = true,
-      funcTable   = {name="myRoutines", caslib="casuser", replace=true},
-      package     = "myPackage",
-      routineCode = myFilter;
-   run;
+   %FCMPActionLoad(append=true);
 quit;
 
 proc network
@@ -511,43 +438,34 @@ proc network
       maxMatches    = 100000;
 run;
 
-data mycas.inmatePairs;
-   merge mycas.outMatchNodes(where=(nodeQ="inmate1") rename=(node=from))
-         mycas.outMatchNodes(where=(nodeQ="inmate2") rename=(node=to));
-   by match;
-   keep from to;
-run;
-
+%createInmateLinks();
 
 proc network
-   links            = mycas.inmatePairs
-   ;
+   links            = mycas.inmatePairs;
    clique
-      out           = mycas.outCliques
-      minNodeWeight = 3
+      out           = mycas.inmateCliques
+      minSize       = 3
+      maxSize       = 3
       maxCliques    = ALL;
       ;
 run;
 
-%joinNodeInfo(outCliques, inmates, node, inmateId, name, (firstName || ' ' || lastName));
-proc sort data=mycas.outCliques out=outCliques; by clique node; run;
+
+%createCliqueLinks();
+
+%joinNodeInfo(inmateCliques, inmates, node, inmateId, name, (TRIM(firstName) || '\n' || TRIM(lastName)));
+
+%visualizeQuery(query_4);
+%visualizeCliques(query_4_match, num=7, layout=sfdp);
+
+proc sort data=mycas.inmateCliques out=inmateCliques; by clique node; run;
 title "Cliques of Inmates: Method 2";
-proc print data=outCliques(obs=50);
+proc print data=inmateCliques(obs=50);
    by clique;
    label node="InmateId";
 run;
 title;
 
-
-%macro unloadGraph();
-   %if (%symexist(graphId)) %then %do;
-      proc cas;
-         network.unloadGraph result=r /
-            display={excludeAll=TRUE} graph = &graphId;
-      run;
-      %symdel graphId;
-   %end;
-%mend unloadGraph;
 proc cas;
    %unloadGraph();
 quit;

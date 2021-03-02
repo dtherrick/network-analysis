@@ -1,6 +1,6 @@
 digraph G {
 layout=dot
-node[colorscheme=paired8, style=filled, color=black]
+node[colorscheme=paired8, style=filled, color=black, fixedSize=true, width=1.4, height=.8]
 "R04P04S25"[fillcolor= "3",label= "P04S25"]
 "I23074"[fillcolor= "1",label= "Jett\nMccormick"]
 "I52186"[fillcolor= "1",label= "Esteban\nYates"]
