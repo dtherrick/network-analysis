@@ -1,8 +1,18 @@
+"""Examples.py: modules that create datasets.
+
+Simple module that generates the datasets we need for the Python versions
+of the public network analysis demos.
+"""
 import pandas as pd
 from pandas import DataFrame
 
 
 def clique_graph_from_links() -> DataFrame:
+    """clique_graph_from_links :: Generates a dataset we use in the clique example.
+
+    Returns:
+        DataFrame: The edge list we provide.
+    """
     colNames = ["from", "to"]
     links = [
         (0, 1),
