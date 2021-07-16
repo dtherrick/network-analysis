@@ -41,6 +41,9 @@ def render_plot(
     node_size: int = 15,
     node_color: str = Blues8[-1],
     node_alpha: float = 1.0,
+    aspect_ratio: float = None,
+    width: int = 600,
+    height: int = 600,
     outfile: str = None,
 ) -> Plot:
     """render_plot :: simple function to plot a graph using bokeh.
@@ -52,6 +55,9 @@ def render_plot(
         node_size (int): Optional, default 15. Set the size of the nodes.
         node_color (str): Optional. attribute label with each node's color.
         node_alpha (float): Optional. Background color transparency.
+        aspect_ratio (float): Optional. Defined aspect ratio of the figure.
+        width (int): Optional, default 600px. Non-negative integer pixel width.
+        height (int): Optional, default 600px. Non-negative integer pixel height.
         outfile (str): Optional. Name of the export file. Defaults to None.
 
     Returns:
@@ -61,6 +67,9 @@ def render_plot(
     plot = Plot(
         x_range=Range1d(-10.1, 10.1),
         title=title,
+        width=width,
+        height=height,
+        aspect_ratio=aspect_ratio,
     )
 
     plot.xgrid.grid_line_color = None
