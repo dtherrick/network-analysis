@@ -3,6 +3,8 @@
 Simple module that generates the datasets we need for the Python versions
 of the public network analysis demos.
 """
+from typing import Dict
+
 import pandas as pd
 from pandas import DataFrame
 
@@ -192,3 +194,67 @@ def paths_graph_from_links() -> DataFrame:
 
     df = pd.DataFrame(links, columns=colNames)
     return df
+
+
+def reach_graph_from_links() -> DataFrame:
+    """reach_graph_from_links :: return a graph representing an org structure.
+
+    Returns:
+        DataFrame: created from edge list
+    """
+    colNames = ["employee_id", "manager_id"]
+    links = [
+        (1, 0),
+        (2, 1),
+        (3, 1),
+        (4, 1),
+        (5, 1),
+        (6, 2),
+        (7, 2),
+        (8, 2),
+        (9, 2),
+        (10, 3),
+        (11, 3),
+        (12, 3),
+        (13, 3),
+        (14, 4),
+        (15, 4),
+        (16, 7),
+        (17, 7),
+        (18, 8),
+        (19, 8),
+        (20, 8),
+    ]
+    df = pd.DataFrame(links, columns=colNames)
+    return df
+
+
+def reach_nodes() -> Dict:
+    """reach_nodes :: provide the node attribute information.
+
+    Returns:
+        Dict: key is node id, value is employee name.
+    """
+    nodes = {
+        {1: "Michael North"},
+        {2: "Megan Berry"},
+        {3: "Sarah Berry"},
+        {4: "Zoe Black"},
+        {5: "Tim James"},
+        {6: "Bella Tucker"},
+        {7: "Ryan Metcalfe"},
+        {8: "Max Mills"},
+        {9: "Benjamin Glover"},
+        {10: "Carolyn Henderson"},
+        {11: "Nicola Kelly"},
+        {12: "Alexandra Climo"},
+        {13: "Dominic King"},
+        {14: "Leonard Gray"},
+        {15: "Eric Rampling"},
+        {16: "Piers Paige"},
+        {17: "Ryan Henderson"},
+        {18: "Frank Tucker"},
+        {19: "Nathan Ferguson"},
+        {20: "Kevin Rampling"},
+    }
+    return nodes

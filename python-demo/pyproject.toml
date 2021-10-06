@@ -10,6 +10,10 @@ jupyterlab = "^3.0.16"
 swat = "^1.9.2"
 bokeh = "^2.3.3"
 jupyter-bokeh = "^3.0.2"
+jupyterthemes = "^0.20.0"
+jupyter-contrib-nbextensions = "^0.5.1"
+nbconvert = "<6"
+graphviz = "^0.17"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.4"
@@ -37,6 +41,7 @@ Sphinx = "^4.0.2"
 rstcheck = "^3.3.1"
 sphinx-autodoc-typehints = "^1.12.0"
 codecov = "^2.1.11"
+autopep8 = "^1.5.7"
 
 [tool.coverage.paths]
 source = ["src", "*/site-packages"]
