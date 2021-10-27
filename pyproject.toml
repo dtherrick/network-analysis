@@ -14,6 +14,7 @@ jupyterthemes = "^0.20.0"
 jupyter-contrib-nbextensions = "^0.5.1"
 nbconvert = "<6"
 graphviz = "^0.17"
+matplotlib = "^3.4.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.4"
