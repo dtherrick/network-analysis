@@ -1,0 +1,19 @@
+digraph {
+	A [color=blue penwidth=3]
+	B
+	C
+	D [color=blue penwidth=3]
+	E [color=blue penwidth=3]
+	F
+	A -> B [label=1]
+	A -> E [label=1]
+	B -> C [label=1]
+	C -> A [label=6]
+	C -> D [label=1]
+	D -> E [label=3 color=blue penwidth=3]
+	D -> F [label=1]
+	E -> B [label=1]
+	E -> C [label=4]
+	F -> E [label=1]
+	E -> A [label=1 color=blue penwidth=3]
+}
