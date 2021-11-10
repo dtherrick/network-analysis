@@ -1,8 +1,15 @@
-option casport=13404 cashost="orgrd061.unx.sas.com";
+/* Copyright © 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+SPDX-License-Identifier: Apache-2.0 */
+
+option casport=<your_cas_port> cashost=<your_cas_url>;
 cas;
 caslib _all_ assign;
 
 options caslib=casuser;
+
+/*************************************/
+/* Create the organization structure */
+/*************************************/
 
 data employees;
   infile datalines dsd;
@@ -35,6 +42,7 @@ data employees;
 ;
 run;
 	
+/* Utility macros */
 %macro isBlank( param ) ;
     %sysevalf( %superq( param ) =, boolean )
   %mend ;
@@ -98,4 +106,5 @@ run;
 
 %mend;
 
+/* Call the macro to find all employees who report to employee id 2 (Megan Barry) */
 %recursive(id = 2);

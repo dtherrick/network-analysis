@@ -1,7 +1,15 @@
-option casport=13404 cashost="orgrd061.unx.sas.com";
-cas;
+/* Copyright © 2021, SAS Institute Inc., Cary, NC, USA.  All Rights Reserved.
+SPDX-License-Identifier: Apache-2.0 */
 
-libname mycas cas caslib="CASUSER(daherr)";
+option casport=<your_cas_port> cashost=<your_cas_url>;
+cas;
+caslib _all_ assign;
+
+options caslib=casuser;
+
+/*************************************/
+/* Create the organization structure */
+/*************************************/
 
 data employees;
   infile datalines dsd;
@@ -32,7 +40,11 @@ data employees;
 19, "Nathan Ferguson", 8
 20, "Kevin Rampling", 8 
 ;
-	
+
+/*******************************************************************************/
+/* Create the edgelist for reporting.                                          */
+/* We could extract from above also, but for our simple example this suffices. */
+/*******************************************************************************/
 data linkSetIn;
 	infile datalines dsd;
 	input from to;
@@ -58,12 +70,14 @@ data linkSetIn;
 8, 20 
 ;
 	
+/* define the node subset to find our reports */    
 data NodeSubSetIn;
    input node reach;
    datalines;
 2 1
 ;
 	
+/* add links and node subset to CAS */
 data mycas.linkSetIn;
 	set linkSetIn;
 	run;
@@ -72,10 +86,12 @@ data mycas.NodeSubSetIn;
 	set NodeSubSetIn;
 	run;
 	
+/* load our network actionset */
 proc cas;
 	loadactionset "network";
 quit;
 
+/* Use the reach action to find all of Megan Barry's reports */
 proc cas;
    network.reach result=r status=s /
       direction     = "directed"
