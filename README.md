@@ -24,7 +24,9 @@ This repository contains examples and demonstrations of the network analysis cap
    - for network visualizations
 - python>=3.6.5 and required packages
    - for jupyter notebook execution
-   - packages used in this demo are given in [requirements.txt](requirements.txt)
+   - packages used in this demo are given in [pyproject.toml](pyproject.toml) and [poetry.lock](poetry.lock)
+   - We recommend using [Poetry](https://python-poetry.org) for virtual environment and package management. See the next section for instructions to install Poetry.
+   -  
 
 ### Installation
 
@@ -38,14 +40,19 @@ This repository contains examples and demonstrations of the network analysis cap
 
 **Details**
 - Clone the repository as specified under **Quick Start** above.
-- Install a fresh python environment using conda:
-   - `conda init bash`
-   - `conda create --name network-analysis python=3.6.5`
-   - `conda activate network-analysis`
-   - `conda install -c sas-institute --file requirements.txt`
+- If Poetry is not installed, install as follows from the terminal:
+  - OSX / Linux / Bash On Windows: `curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -`
+  - Windows Powershell: `(Invoke-WebRequest -Uri https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py -UseBasicParsing).Content | python -`
+- Create your virtual environment and install the project's Python dependencies with the following command (executed in the root directory of the repository (where the `pyproject.toml` and `poetry.lock` are located)).
+  - `poetry install`
+- After the virtual environment is created, and dependencies are installed, activate the virtual environment with the following command:
+  - `poetry shell`
 - Make the following modifications within [common/conf/environment.txt](common/conf/environment.txt) to enable connections to a Cloud Analytic Services (CAS) server. Contact your SAS system administrator (or person who deployed SAS® Viya) for more information:
    - CAS_SERVER_HOST=<i>set this to the hostname of your CAS server</i>
    - CAS_SERVER_PORT=<i>set this to the port of your CAS server</i>
+ - Alternatively, some of the notebooks show how to connect to a CAS server when the host and port are set as shell environment variables. Create those variables:
+   - `export CAS_SERVER_HOST='<set thie to the hostname of your CAS server>'`
+   - `export CAS_SERVER_PORT='<set thie to the port of your CAS server>'`
 
 ### Running
 
@@ -54,10 +61,11 @@ This repository contains examples and demonstrations of the network analysis cap
    - Navigate to the directory where you cloned this repository, and then navigate to the sas/ directory of the demo you wish to run.
    - Open the .sas script and run by clicking the run icon or pressing F3.
 - If you intend to run the Jupyter notebook versions of these demos:
-   - First ensure that you are have the required python packages installed by using `conda install -c conda-forge -c sas-institute --file requirements.txt` from a terminal window (see the above details section for more context).
-   - launch a jupyter notebook session by using `jupyter notebook start` from a terminal window.
-   - after launching, use a web browser to connect to the displayed URL for your newly created Jupyter notebook server
-   - navigate to the directory where you cloned this repository, and then navigate to the python/ directory of the demo you wish to run.
+   - First ensure that you are have the required python packages installed by using `poetry install` from a terminal window (see the above details section for more context).
+   - Start your jupyter server. This repository installs both **jupyterlab** and the traditional notebook.
+     - if you prefer the traditional notebook, invoke `jupyter notebook`
+     - if you prefer the lab, invoke `jupyter lab`
+   - On launch, the server should automatically open a web browser in the local home directory where you cloned this repository.
    - open the .ipynb notebook and then run the cells interactively by clicking the run button.
 
 ### Viewing graphs with graphviz

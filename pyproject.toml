@@ -1,0 +1,60 @@
+[tool.poetry]
+name = "python-demo"
+version = "0.1.0"
+description = ""
+authors = ["Damian Herrick <damian.herrick@sas.com>"]
+
+[tool.poetry.dependencies]
+python = ">=3.7.10,<3.10"
+jupyterlab = "^3.0.16"
+swat = "^1.9.2"
+bokeh = "^2.3.3"
+jupyter-bokeh = "^3.0.2"
+jupyterthemes = "^0.20.0"
+jupyter-contrib-nbextensions = "^0.5.1"
+nbconvert = "<6"
+graphviz = "^0.17"
+matplotlib = "^3.4.3"
+beautifulsoup4 = "^4.10.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.4"
+coverage = {version = "^5.5", extras = ["toml"]}
+nox = "^2020.12.31"
+pytest-mock = "^3.6.1"
+black = {version = "^21.5b1", allow-prereleases = true}
+flake8 = "^3.9.2"
+flake8-black = "^0.2.1"
+flake8-import-order = "^0.18.1"
+pytest-cov = "^2.12.0"
+flake8-bandit = "^2.1.2"
+flake8-bugbear = "^21.4.3"
+safety = "^1.10.3"
+pre-commit = "^2.13.0"
+mypy = "^0.812"
+pytype = "^2021.5.25"
+typeguard = "^2.12.0"
+flake8-annotations = "^2.6.2"
+flake8-docstrings = "^1.6.0"
+darglint = "^1.8.0"
+xdoctest = "^0.15.4"
+Pygments = "^2.9.0"
+Sphinx = "^4.0.2"
+rstcheck = "^3.3.1"
+sphinx-autodoc-typehints = "^1.12.0"
+codecov = "^2.1.11"
+autopep8 = "^1.5.7"
+
+[tool.coverage.paths]
+source = ["src", "*/site-packages"]
+
+[tool.coverage.run]
+branch = true
+source = ["pythondev_example"]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 100
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
